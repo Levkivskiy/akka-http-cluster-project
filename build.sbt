@@ -1,6 +1,9 @@
 val globalSettings = Seq[SettingsDefinition](
   version := "0.1",
   scalaVersion := "2.12.6",
+  addCompilerPlugin(
+    "org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full
+  )
 )
 
 val circeV = "0.9.3"
