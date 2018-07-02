@@ -14,13 +14,15 @@ val circeDeps = Seq(
   "io.circe" %% "circe-java8"
 ).map(_ % circeV)
 
-val mongoDb = Project("mongo", file("mongo_db"))
+lazy val mongoDb = Project("mongo", file("mongo_db"))
   .settings(globalSettings: _*)
   .settings(
     name := "MongoDb",
     libraryDependencies ++= Seq(
       "org.mongodb.scala" %% "mongo-scala-driver" % "2.3.0",
       "org.reactivemongo" %% "reactivemongo" % "0.12.7",
-      "net.ruippeixotog" %% "scala-scraper" % "2.1.0"
+      "net.ruippeixotog" %% "scala-scraper" % "2.1.0",
+      "org.scalatest" % "scalatest_2.12" % "3.0.5",
+      "org.scalatest" % "scalatest_2.12" % "3.0.5" % "test"
     )
   )
