@@ -6,7 +6,7 @@ import reactivemongo.api.commands.Command
 
 trait StandartComand {
 
-  sealed trait Command
+  trait Command
 
   case object GetAll extends Command
 
@@ -16,9 +16,13 @@ trait StandartComand {
 
   case object MaxScore extends Command
 
-  case class Insert(game: Game) extends Command
+  case class Insert[A](value: A) extends Command
 
   case class Delete(id: ObjectId) extends Command
 
   case class Update(id: ObjectId, field: String, value: String) extends Command
+
+  case class MaxByField(platform: String) extends Command
+
+  case class MaxByText(str: String) extends Command
 }

@@ -2,8 +2,10 @@ package Actors
 
 import akka.actor.{Actor, Props}
 import repositories.GameRepo
+
 import scala.concurrent.Future
 import akka.pattern.pipe
+import model.gameInform.Game
 
 import scala.concurrent.ExecutionContext
 
@@ -22,9 +24,9 @@ class GameActor(implicit ec: ExecutionContext) extends Actor {
       gameRepo.findAll() pipeTo sender()
     case GetName(str) =>
       gameRepo.findByField("name", str) pipeTo sender()
-    case MaxScore =>
-      gameRepo.maxScore() pipeTo sender()
-    case Insert(game) =>
+    case MaxByField(filed) =>
+      gameRepo.maxByFiled(filed) pipeTo sender()
+    case Insert(game: Game) =>
       gameRepo.insert(game) pipeTo sender()
     case Delete(id) =>
       gameRepo.delete(id) pipeTo sender()

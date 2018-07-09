@@ -15,7 +15,7 @@ import com.mongodb.client.model.Projections
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.reflect.ClassTag
-import org.mongodb.scala.model.Sorts._
+import org.mongodb.scala.model.Sorts.{metaTextScore, ascending}
 import org.mongodb.scala.result.{DeleteResult, UpdateResult}
 
 abstract class CrudRepo[A: ClassTag](nameCollection: String)(implicit ec: ExecutionContext) {
@@ -30,7 +30,7 @@ abstract class CrudRepo[A: ClassTag](nameCollection: String)(implicit ec: Execut
 
   def insert(item: A): Future[Completed] = collectionDB.insertOne(item).head()
 
-  def insert(items: Seq[A]) = collectionDB.insertMany(items).toFuture()
+  def insert(items: Seq[A]): Future[Completed] = collectionDB.insertMany(items).toFuture()
 
   def findById(companyId: ObjectId) = collectionDB.find(equal("_id", companyId))
     .first().toFutureOption()
@@ -47,7 +47,7 @@ abstract class CrudRepo[A: ClassTag](nameCollection: String)(implicit ec: Execut
       .updateMany(equal(fieldToIdentify, identifier), set(fieldToUpdate, newValue))
 
   def delete(companyId: ObjectId): Future[DeleteResult] = collectionDB.deleteOne(equal("_id", companyId))
-      .head()
+    .head()
 
   def findAll(): Future[Seq[A]] = collectionDB.find().toFuture()
 
@@ -55,7 +55,11 @@ abstract class CrudRepo[A: ClassTag](nameCollection: String)(implicit ec: Execut
 
   def getAllIds() = collectionDB.find(excludeId()).toFuture()
 
-  def maxScore() = {
-    collectionDB.find().sort(ascending("score")).first().toFutureOption()
+  def maxByFiled(field: String) = {
+    collectionDB.find().sort(ascending(field)).first().toFutureOption()
+  }
+
+  def maxByText(field: String) = {
+    collectionDB.find().sort(metaTextScore(field)).first().toFutureOption()
   }
 }

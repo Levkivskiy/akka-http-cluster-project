@@ -28,10 +28,10 @@ class ServerApi(gameRef: ActorRef, criricRef: ActorRef, platformRef: ActorRef)
                (implicit ec: ExecutionContext) extends Directives with FailFastCirceSupport {
   implicit val timeout = Timeout(10.seconds)
 
-  def routes: server.Route = gameRoute ~ criticRoute
+  def routes: server.Route = gameRoute ~ criticRoute ~ platformRoute
 
   //GAME
-  def gameRoute = {
+  def gameRoute: Route = {
     pathPrefix("game") {
       pathPrefix("all") {
         path("inform") {
@@ -55,7 +55,7 @@ class ServerApi(gameRef: ActorRef, criricRef: ActorRef, platformRef: ActorRef)
         }
       } ~ pathPrefix("score") {
         path("max") {
-          val futName = (gameRef ? GameActor.MaxScore).mapTo[Option[Game]]
+          val futName = (gameRef ? GameActor.MaxByField("score")).mapTo[Option[Game]]
           onSuccess(futName) {
             case Some(game) => complete(game)
             case None => complete(BadRequest)
@@ -65,7 +65,7 @@ class ServerApi(gameRef: ActorRef, criricRef: ActorRef, platformRef: ActorRef)
     }
   }
 
-  def gameRouteRUD = {
+  def gameRouteRUD: Route = {
     path("insert") {
       entity(as[Game]) { movie =>
         val gameInsFut = (gameRef ? GameActor.Insert(movie)).mapTo[Completed]
@@ -109,6 +109,34 @@ class ServerApi(gameRef: ActorRef, criricRef: ActorRef, platformRef: ActorRef)
               complete(game.map(name => (name.firstneme, name.lastname)))
             }
           }
+      } ~ criticRouteRUD
+    }
+  }
+
+  def criticRouteRUD: Route = {
+    path("insert") {
+      entity(as[Critic]) { critic =>
+        val InsertFut = (criricRef ? CriticActor.Insert(critic)).mapTo[Completed]
+        onComplete(InsertFut) {
+          case Success(_) => complete(OK)
+          case Failure(_) => complete(BadRequest)
+        }
+      }
+    } ~ path("delete") {
+      parameters('id.as[String]) { (id) =>
+        val futDelete = (criricRef ? CriticActor.Delete(new ObjectId(id))).mapTo[DeleteResult]
+        onComplete(futDelete) {
+          case Success(_) => complete(OK)
+          case Failure(_) => complete(BadRequest)
+        }
+      }
+    } ~ path("update") {
+      parameters('id, 'field, 'value) { (id, field, value) =>
+        val futUpdate = (criricRef ? CriticActor.Update(new ObjectId(id), field, value)).mapTo[UpdateResult]
+        onComplete(futUpdate) {
+          case Success(_) => complete(OK)
+          case Failure(_) => complete(BadRequest)
+        }
       }
     }
   }
@@ -128,6 +156,45 @@ class ServerApi(gameRef: ActorRef, criricRef: ActorRef, platformRef: ActorRef)
               complete(game.map(_.name))
             }
           }
+      } ~ pathPrefix("score") {
+        path("max") {
+          parameters('platform){ (platform) =>
+            val futName = (gameRef ? PlatformActor.MaxByText(platform)).mapTo[Option[model.gameInform.Game]]
+            onSuccess(futName) {
+              case Some(game) => complete(game.platorm)
+              case None => complete(BadRequest)
+            }
+          }
+        }
+      } ~ platformRouteRUD
+      /////////////
+    }
+  }
+
+  def platformRouteRUD: Route = {
+    path("insert") {
+      entity(as[Platform]) { platform =>
+        val InsertFut = (platformRef ? PlatformActor.Insert(platform)).mapTo[Completed]
+        onComplete(InsertFut) {
+          case Success(_) => complete(OK)
+          case Failure(_) => complete(BadRequest)
+        }
+      }
+    } ~ path("delete") {
+      parameters('id.as[String]) { (id) =>
+        val futDelete = (platformRef ? PlatformActor.Delete(new ObjectId(id))).mapTo[DeleteResult]
+        onComplete(futDelete) {
+          case Success(_) => complete(OK)
+          case Failure(_) => complete(BadRequest)
+        }
+      }
+    } ~ path("update") {
+      parameters('id, 'field, 'value) { (id, field, value) =>
+        val futUpdate = (platformRef ? PlatformActor.Update(new ObjectId(id), field, value)).mapTo[UpdateResult]
+        onComplete(futUpdate) {
+          case Success(_) => complete(OK)
+          case Failure(_) => complete(BadRequest)
+        }
       }
     }
   }
