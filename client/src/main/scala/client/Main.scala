@@ -7,15 +7,19 @@ import model.platformInform.{Platform, PlatformTechSpecs}
 import org.bson.types.ObjectId
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
-import scala.concurrent.ExecutionContext.Implicits.global
+import model.critic.Critic
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
-import scala.concurrent.Await
-import scala.concurrent.Await
+import scala.concurrent.{Await, Future}
 
 object Main extends App {
   implicit val system = ActorSystem("movie-client")
   implicit val materializer = ActorMaterializer()
+
+  def awaitResult[A](value: Future[A]): Unit ={
+    Await.result(value, 5.second)
+  }
 
   try {
     val client = new Client()
@@ -28,7 +32,6 @@ object Main extends App {
       List(new ObjectId()),
       Some(60)
     )
-
     val game = Game(
       platform.games.head,
       "Cyberpunk",
@@ -45,6 +48,7 @@ object Main extends App {
       List(CritickLink.empty()),
       List("asdasd")
     )
+    val platformTest = Platform.empty()
     //OK
     lazy val insertGame = Await.result(
       client.insertGame(
@@ -52,6 +56,14 @@ object Main extends App {
       ),
       5.second
     )
+
+    val critick = Critic.empty()
+
+    lazy val insertCritic: String = Await.result(
+      client.insertCritic(critick),
+      5.second
+    )
+
     //OK
     lazy val deleteGame = Await.result(
       client.deleteGameById(
@@ -69,10 +81,10 @@ object Main extends App {
       5.second
     )
 
-    //println(deleteGame)
-    println(updateGame)
+    println(insertCritic)
+
   }
   finally {
-    Await.result(system.terminate(), 5.second)
+    Await.result(system.terminate(), 15.second)
   }
 }

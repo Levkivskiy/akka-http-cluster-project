@@ -1,7 +1,7 @@
 import java.time.LocalDate
 import java.util.Date
 
-import model.critic.Critic
+import model.critic.{Critic, Reviews}
 import model.gameInform.{CritickLink, Game, PlatformLink}
 import model.platformInform.{Platform, PlatformTechSpecs}
 import org.bson.codecs.configuration.CodecRegistries.{fromProviders, fromRegistries}
@@ -10,7 +10,7 @@ import org.bson.types.ObjectId
 import org.mongodb.scala.bson.codecs.DEFAULT_CODEC_REGISTRY
 import org.mongodb.scala.{Completed, MongoClient, MongoCollection, SingleObservable}
 import org.mongodb.scala.bson.codecs.Macros._
-import repositories.GameRepo
+import repositories.{CriticRepo, GameRepo}
 
 import scala.concurrent.{Await, Future}
 import scala.concurrent.duration._
@@ -45,10 +45,12 @@ object main extends App {
     List("asdasd")
   )
 
+  val critic = Critic(new ObjectId(), "oleg", "leva", LocalDate.now(),List[Reviews]())
 
   val gameRepo = new GameRepo
+  val criticRepo = new CriticRepo
 
-  val gameInsFut: Future[Completed] = gameRepo.insert(Seq(game))
+  val gameInsFut: Future[Completed] = criticRepo.insert(critic)
 
   Await.result(gameInsFut, 10.second)
 }

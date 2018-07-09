@@ -16,6 +16,6 @@ case class Platform(_id: ObjectId,
                     price: Option[Int])
 
 object Platform extends JsonObjectId{
-  def empty() = Platform(new ObjectId(), "",LocalDate.MIN
+  def empty() = Platform(new ObjectId(), "",LocalDate.now()
     , PlatformTechSpecs.empty(), List[ObjectId](), None)
 }
