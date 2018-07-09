@@ -18,6 +18,7 @@ import akka.pattern.{ask, pipe}
 import org.mongodb.scala.Completed
 import org.mongodb.scala.bson._
 import org.mongodb.scala.bson.collection.mutable.Document
+import org.mongodb.scala.result.{DeleteResult, UpdateResult}
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
@@ -30,6 +31,7 @@ class ServerApi(gameRef: ActorRef, criricRef: ActorRef, platformRef: ActorRef)
 
   implicit val timeout = Timeout(10.seconds)
 
+  //GAME
   def gameRoute = {
     pathPrefix("game") {
       pathPrefix("all") {
@@ -60,13 +62,34 @@ class ServerApi(gameRef: ActorRef, criricRef: ActorRef, platformRef: ActorRef)
             case None => complete(BadRequest)
           }
         }
-      } ~ path("insert") {
-        entity(as[Game]) { movie =>
-          val gameInsFut = (gameRef ? GameActor.Insert(movie)).mapTo[Option[Completed]]
-          onComplete(gameInsFut) {
-            case Success(_) => complete(OK)
-            case Failure(_) => complete(BadRequest)
-          }
+      } ~ gameRouteRUD
+    }
+  }
+
+  def gameRouteRUD = {
+    path("insert") {
+      entity(as[Game]) { movie =>
+        val gameInsFut = (gameRef ? GameActor.Insert(movie)).mapTo[Completed]
+        onComplete(gameInsFut) {
+          case Success(_) => complete(OK)
+          case Failure(_) => complete(BadRequest)
+        }
+      }
+    } ~ path("delete") {
+      parameters('id.as[String]) { (id) =>
+        val futDelete = (gameRef ? GameActor.Delete(new ObjectId(id))).mapTo[DeleteResult]
+        onComplete(futDelete) {
+          case Success(_) => complete(OK)
+          case Failure(_) => complete(BadRequest)
+        }
+      }
+    } ~ path("update") {
+      parameters('id, 'field, 'value) { (id, field, value) =>
+        val futUpdate = (gameRef ? GameActor.Update(new ObjectId(id), field, value))
+          .mapTo[UpdateResult]
+        onComplete(futUpdate) {
+          case Success(_) => complete(OK)
+          case Failure(_) => complete(BadRequest)
         }
       }
     }

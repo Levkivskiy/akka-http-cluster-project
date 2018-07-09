@@ -15,7 +15,7 @@ class PlatformActor(implicit ec: ExecutionContext) extends Actor {
 
   val platformRepo = new PlatformRepo
 
-  def receive = {
+  override def receive = {
     case GetAll =>
       platformRepo.findAll() pipeTo sender()
   }

@@ -12,6 +12,7 @@ object GameActor extends StandartComand {
 }
 
 class GameActor(implicit ec: ExecutionContext) extends Actor {
+
   import GameActor._
 
   val gameRepo = new GameRepo
@@ -25,6 +26,9 @@ class GameActor(implicit ec: ExecutionContext) extends Actor {
       gameRepo.maxScore() pipeTo sender()
     case Insert(game) =>
       gameRepo.insert(game) pipeTo sender()
+    case Delete(id) =>
+      gameRepo.delete(id) pipeTo sender()
+    case Update(id, field, value) =>
+      gameRepo.update(id, field, value) pipeTo sender()
   }
-
 }

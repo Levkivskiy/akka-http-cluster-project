@@ -9,13 +9,14 @@ import org.mongodb.scala.bson.ObjectId
 import org.mongodb.scala.bson.codecs.DEFAULT_CODEC_REGISTRY
 import org.mongodb.scala.model.Filters.equal
 import org.mongodb.scala.model.Updates.set
-import org.mongodb.scala.{Completed, Document, MongoClient, MongoCollection}
+import org.mongodb.scala.{Completed, Document, MongoClient, MongoCollection, SingleObservable}
 import org.mongodb.scala.model.Projections._
 import com.mongodb.client.model.Projections
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.reflect.ClassTag
 import org.mongodb.scala.model.Sorts._
+import org.mongodb.scala.result.{DeleteResult, UpdateResult}
 
 abstract class CrudRepo[A: ClassTag](nameCollection: String)(implicit ec: ExecutionContext) {
 
@@ -27,7 +28,7 @@ abstract class CrudRepo[A: ClassTag](nameCollection: String)(implicit ec: Execut
     database.getCollection(nameCollection)
   }
 
-  def insert(item: A): Future[Option[Completed]] = collectionDB.insertOne(item).headOption()
+  def insert(item: A): Future[Completed] = collectionDB.insertOne(item).head()
 
   def insert(items: Seq[A]) = collectionDB.insertMany(items).toFuture()
 
@@ -38,15 +39,15 @@ abstract class CrudRepo[A: ClassTag](nameCollection: String)(implicit ec: Execut
     collectionDB
       .find(equal(field, value)).first().toFutureOption()
 
-  def update(companyId: ObjectId, fieldToUpdate: String, newValue: Any) =
-    collectionDB
-      .updateOne(equal("_id", companyId), set(fieldToUpdate, newValue))
+  def update(companyId: ObjectId, fieldToUpdate: String, newValue: Any): Future[UpdateResult] =
+    collectionDB.updateOne(equal("_id", companyId), set(fieldToUpdate, newValue)).head()
 
   def updateMany(fieldToIdentify: String, identifier: Any, fieldToUpdate: String, newValue: Any) =
     collectionDB
       .updateMany(equal(fieldToIdentify, identifier), set(fieldToUpdate, newValue))
 
-  def delete(companyId: ObjectId) = collectionDB.deleteOne(equal("_id", companyId))
+  def delete(companyId: ObjectId): Future[DeleteResult] = collectionDB.deleteOne(equal("_id", companyId))
+      .head()
 
   def findAll(): Future[Seq[A]] = collectionDB.find().toFuture()
 
