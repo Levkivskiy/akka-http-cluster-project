@@ -11,6 +11,7 @@ object PlatformActor extends StandartComand {
 }
 
 class PlatformActor(implicit ec: ExecutionContext) extends Actor {
+
   import PlatformActor._
 
   val platformRepo = new PlatformRepo
@@ -18,6 +19,8 @@ class PlatformActor(implicit ec: ExecutionContext) extends Actor {
   override def receive = {
     case GetAll =>
       platformRepo.findAll() pipeTo sender()
+    case GetName(str) =>
+      platformRepo.findByField("name", str) pipeTo sender()
   }
 
 }

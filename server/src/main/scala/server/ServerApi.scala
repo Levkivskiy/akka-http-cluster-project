@@ -1,9 +1,8 @@
 package server
 
-import Actors.{CriticActor, GameActor}
+import Actors.{CriticActor, GameActor, PlatformActor}
 import akka.util.Timeout
-import akka.http.javadsl.server._
-import akka.http.scaladsl.server.Directives
+import akka.http.scaladsl.server.{Directives, Route}
 import akka.http.scaladsl.model.{HttpResponse, StatusCodes}
 import akka.stream.scaladsl._
 import akka.http.scaladsl.model.ws._
@@ -12,12 +11,13 @@ import akka.actor._
 import akka.http.scaladsl.model.StatusCodes._
 import com.typesafe.scalalogging.StrictLogging
 import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport
-import model.gameInform.Game
+import model.gameInform._
+import model.critic._
+import model.platformInform._
 import io.circe.parser._
 import akka.pattern.{ask, pipe}
 import org.mongodb.scala.Completed
 import org.mongodb.scala.bson._
-import org.mongodb.scala.bson.collection.mutable.Document
 import org.mongodb.scala.result.{DeleteResult, UpdateResult}
 
 import scala.concurrent.duration._
@@ -26,10 +26,9 @@ import scala.util.{Failure, Success}
 
 class ServerApi(gameRef: ActorRef, criricRef: ActorRef, platformRef: ActorRef)
                (implicit ec: ExecutionContext) extends Directives with FailFastCirceSupport {
-
-  def routes: server.Route = gameRoute
-
   implicit val timeout = Timeout(10.seconds)
+
+  def routes: server.Route = gameRoute ~ criticRoute
 
   //GAME
   def gameRoute = {
@@ -91,6 +90,44 @@ class ServerApi(gameRef: ActorRef, criricRef: ActorRef, platformRef: ActorRef)
           case Success(_) => complete(OK)
           case Failure(_) => complete(BadRequest)
         }
+      }
+    }
+  }
+
+  def criticRoute: Route = {
+    pathPrefix("critic") {
+      pathPrefix("all") {
+        path("inform") {
+          val fut = (criricRef ? CriticActor.GetAll).mapTo[Seq[model.critic.Critic]]
+          onSuccess(fut) { game =>
+            complete(game)
+          }
+        } ~
+          path("name") {
+            val fut = (criricRef ? CriticActor.GetAll).mapTo[Seq[model.critic.Critic]]
+            onSuccess(fut) { game =>
+              complete(game.map(name => (name.firstneme, name.lastname)))
+            }
+          }
+      }
+    }
+  }
+
+  def platformRoute: Route = {
+    pathPrefix("platform") {
+      pathPrefix("all") {
+        path("inform") {
+          val fut = (platformRef ? PlatformActor.GetAll).mapTo[Seq[model.platformInform.Platform]]
+          onSuccess(fut) { game =>
+            complete(game)
+          }
+        } ~
+          path("name") {
+            val fut = (platformRef ? PlatformActor.GetAll).mapTo[Seq[model.platformInform.Platform]]
+            onSuccess(fut) { game =>
+              complete(game.map(_.name))
+            }
+          }
       }
     }
   }
