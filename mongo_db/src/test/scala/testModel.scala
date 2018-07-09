@@ -1,4 +1,5 @@
 import java.text.SimpleDateFormat
+import java.time.LocalDate
 import java.util.Date
 
 import collection.mutable.Stack
@@ -6,7 +7,6 @@ import model.critic._
 import model.gameInform._
 import model.platformInform._
 import org.bson.types.ObjectId
-
 import org.scalatest.FlatSpec
 
 class testModel extends FlatSpec {
@@ -19,7 +19,7 @@ class testModel extends FlatSpec {
     val platform = Platform(
       new ObjectId(),
       "PS4",
-      new Date(1111, 11, 11),
+      LocalDate.now(),
       PlatformTechSpecs.empty(),
       List(new ObjectId()),
       Some(60)
@@ -28,7 +28,7 @@ class testModel extends FlatSpec {
     val game = Game(
       platform.games.head,
       "last of us",
-      new Date(1999, 11, 1),
+      LocalDate.now(),
       9.0,
       List(PlatformLink(
         platform._id,
