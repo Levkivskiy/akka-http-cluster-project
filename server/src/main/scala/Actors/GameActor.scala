@@ -34,3 +34,4 @@ class GameActor(implicit ec: ExecutionContext) extends Actor {
       gameRepo.update(id, field, value) pipeTo sender()
   }
 }
+

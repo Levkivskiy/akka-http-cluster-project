@@ -144,6 +144,7 @@ class ServerApi(gameRef: ActorRef, criricRef: ActorRef, platformRef: ActorRef)
   def platformRoute: Route = {
     pathPrefix("platform") {
       pathPrefix("all") {
+
         path("inform") {
           val fut = (platformRef ? PlatformActor.GetAll).mapTo[Seq[model.platformInform.Platform]]
           onSuccess(fut) { game =>
@@ -158,7 +159,7 @@ class ServerApi(gameRef: ActorRef, criricRef: ActorRef, platformRef: ActorRef)
           }
       } ~ pathPrefix("score") {
         path("max") {
-          parameters('platform){ (platform) =>
+          parameters('platform) { (platform) =>
             val futName = (gameRef ? PlatformActor.MaxByText(platform)).mapTo[Option[model.gameInform.Game]]
             onSuccess(futName) {
               case Some(game) => complete(game.platorm)

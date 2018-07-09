@@ -45,7 +45,7 @@ object main extends App {
     List("asdasd")
   )
 
-  val critic = Critic(new ObjectId(), "oleg", "leva", LocalDate.now(),List[Reviews]())
+  val critic = Critic(new ObjectId(), "oleg", "leva", LocalDate.now(), List[Reviews]())
 
   val gameRepo = new GameRepo
   val criticRepo = new CriticRepo

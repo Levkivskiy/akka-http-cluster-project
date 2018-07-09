@@ -34,4 +34,5 @@ class CriticActor(implicit ec: ExecutionContext) extends Actor {
       criticRepo.update(id, field, value) pipeTo sender()
   }
 
+
 }

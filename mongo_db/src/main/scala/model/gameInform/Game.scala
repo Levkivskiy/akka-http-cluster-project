@@ -22,6 +22,7 @@ case class Game(_id: ObjectId,
                 criticks: List[CritickLink],
                 awards: List[String])
 
+
 object Game extends JsonObjectId {
   def empty() = Game(new ObjectId(), "", LocalDate.MIN, 0.0, List[PlatformLink]()
     , "", "", "", "", List[CritickLink](), List[String]())

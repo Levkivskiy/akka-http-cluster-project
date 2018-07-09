@@ -26,6 +26,7 @@ class CriticRepo(implicit ec: ExecutionContext) extends CrudRepo[Critic]("Critic
       classOf[Reviews]), DEFAULT_CODEC_REGISTRY)
 }
 
+
 class PlatformRepo(implicit ec: ExecutionContext) extends CrudRepo[Platform]("Platform") {
   override val codecRegistry: CodecRegistry =
     fromRegistries(fromProviders(

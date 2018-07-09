@@ -26,3 +26,4 @@ trait StandartComand {
 
   case class MaxByText(str: String) extends Command
 }
+

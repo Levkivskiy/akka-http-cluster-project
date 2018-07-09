@@ -14,6 +14,7 @@ case class Critic(_id: ObjectId,
                   birstDate: LocalDate,
                   reviews: List[Reviews])
 
+
 object Critic extends JsonObjectId {
 
   def empty() = Critic(new ObjectId(), "", "", LocalDate.now(), List[Reviews]())

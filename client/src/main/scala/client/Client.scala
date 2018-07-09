@@ -21,6 +21,7 @@ class Client(
 
   private val http = Http()
 
+
   def insertGame(game: Game): Future[String] = {
     val response = http.singleRequest(
       HttpRequest(

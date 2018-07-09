@@ -35,6 +35,7 @@ abstract class CrudRepo[A: ClassTag](nameCollection: String)(implicit ec: Execut
   def findById(companyId: ObjectId) = collectionDB.find(equal("_id", companyId))
     .first().toFutureOption()
 
+
   def findByField(field: String, value: Any) =
     collectionDB
       .find(equal(field, value)).first().toFutureOption()

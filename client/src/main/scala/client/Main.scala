@@ -17,9 +17,10 @@ object Main extends App {
   implicit val system = ActorSystem("movie-client")
   implicit val materializer = ActorMaterializer()
 
-  def awaitResult[A](value: Future[A]): Unit ={
+  def awaitResult[A](value: Future[A]): Unit = {
     Await.result(value, 5.second)
   }
+
 
   try {
     val client = new Client()

@@ -1,9 +1,11 @@
 package mail
+
 import com.github.jurajburian.mailer._
 import javax.mail.Session
 import javax.mail.internet.InternetAddress
 
 import scala.util.Try
+
 class Mailer(sender: String, senderPassword: String) {
 
   val session: Session = (SmtpAddress("smtp.gmail.com", 587)
@@ -22,7 +24,9 @@ class Mailer(sender: String, senderPassword: String) {
 
   val mailer = Mailer(session)
 
-  def sendMessege(msg: Message) =  Try{mailer.send(msg)}
+  def sendMessege(msg: Message) = Try {
+    mailer.send(msg)
+  }
 
   def closeMailer = mailer.close()
 }

@@ -4,10 +4,8 @@ import java.util.concurrent.TimeUnit
 
 import org.mongodb.scala.{Document, Observable}
 
-import scala.concurrent.Await
-import scala.concurrent.duration.Duration
-
 trait Helpers {
+
   implicit class DocumentObservable[C](val observable: Observable[Document])
     extends ImplicitObservable[Document] {
     override val converter: (Document) =>
@@ -20,8 +18,10 @@ trait Helpers {
       String = (doc) => doc.toString
   }
 
+
   trait ImplicitObservable[C] {
     val observable: Observable[C]
     val converter: (C) => String
   }
+
 }

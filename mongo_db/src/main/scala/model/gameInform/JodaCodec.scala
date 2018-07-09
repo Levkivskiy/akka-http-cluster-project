@@ -14,6 +14,7 @@ class JodaCodec extends Codec[DateTime] {
 
   override def getEncoderClass: Class[DateTime] = classOf[DateTime]
 }
+
 /*
 val codecRegistry = fromRegistries(
 fromProviders(classOf[Record]),
