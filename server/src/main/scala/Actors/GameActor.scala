@@ -13,11 +13,9 @@ object GameActor extends StandartComand {
   def name = "game"
 }
 
-class GameActor(implicit ec: ExecutionContext) extends Actor {
+class GameActor(gameRepo: GameRepo)(implicit ec: ExecutionContext) extends Actor {
 
   import GameActor._
-
-  val gameRepo = new GameRepo
 
   def receive = {
     case GetAll =>

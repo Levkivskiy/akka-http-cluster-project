@@ -11,11 +11,9 @@ object PlatformActor extends StandartComand {
   def name = "platform"
 }
 
-class PlatformActor(implicit ec: ExecutionContext) extends Actor {
+class PlatformActor(platformRepo: PlatformRepo)(implicit ec: ExecutionContext) extends Actor {
 
   import PlatformActor._
-
-  val platformRepo = new PlatformRepo
 
   override def receive = {
     case GetAll =>

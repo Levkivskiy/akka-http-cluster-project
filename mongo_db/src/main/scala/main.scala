@@ -18,6 +18,7 @@ import scala.util.Try
 import scala.concurrent.ExecutionContext.Implicits.global
 
 object main extends App {
+  val mongoClient = MongoClient("mongodb://admin:testpass1@ds125341.mlab.com:25341/dru-akka-project")
 
   val platform = Platform(
     new ObjectId(),
@@ -47,8 +48,9 @@ object main extends App {
 
   val critic = Critic(new ObjectId(), "oleg", "leva", LocalDate.now(), List[Reviews]())
 
-  val gameRepo = new GameRepo
-  val criticRepo = new CriticRepo
+
+  val gameRepo = new GameRepo(mongoClient)
+  val criticRepo = new CriticRepo(mongoClient)
 
   val gameInsFut: Future[Completed] = criticRepo.insert(critic)
 

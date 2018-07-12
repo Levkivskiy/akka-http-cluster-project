@@ -18,12 +18,13 @@ import scala.reflect.ClassTag
 import org.mongodb.scala.model.Sorts.{metaTextScore, ascending}
 import org.mongodb.scala.result.{DeleteResult, UpdateResult}
 
-abstract class CrudRepo[A: ClassTag](nameCollection: String)(implicit ec: ExecutionContext) {
+abstract class CrudRepo[A: ClassTag](nameCollection: String,
+                                     mongoClient: MongoClient)
+                                    (implicit ec: ExecutionContext) {
 
   def codecRegistry: CodecRegistry
 
   lazy val collectionDB: MongoCollection[A] = {
-    val mongoClient = MongoClient("mongodb://admin:testpass1@ds125341.mlab.com:25341/dru-akka-project")
     val database = mongoClient.getDatabase("dru-akka-project").withCodecRegistry(codecRegistry)
     database.getCollection(nameCollection)
   }

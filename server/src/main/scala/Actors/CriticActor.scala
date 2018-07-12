@@ -13,11 +13,8 @@ object CriticActor extends StandartComand {
   def name = "critic"
 }
 
-class CriticActor(implicit ec: ExecutionContext) extends Actor {
-
+class CriticActor(criticRepo: CriticRepo)(implicit ec: ExecutionContext) extends Actor {
   import CriticActor._
-
-  val criticRepo = new CriticRepo
 
   def receive = {
     case GetAll =>
