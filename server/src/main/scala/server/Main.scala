@@ -44,7 +44,7 @@ object Main {
       binding <- bindingFuture
       _ <- binding.unbind()
       _ <- system.terminate()
-    } yield system.stop(gameActor)
+    } yield ()
 
     Await.result(stopsSystem, 1.second)
   }
